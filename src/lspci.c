@@ -42,10 +42,16 @@ void show_dev_class(u16 dev_class) {
     }
 }
 
+extern void print_pci_name(int vendor, int device);
+
 void print_device(struct pci_dev *p) {
     printf("%02x:%02x.%x ", p->bus, p->dev, p->func);
     show_dev_class(p->device_class);
-    printf(": [%04x:%04x]\n", p->vendor_id, p->device_id);
+    printf(": ");
+    fflush(stdout);
+    print_pci_name(p->vendor_id, p->device_id);
+    printf(" [%04x:%04x]\n", p->vendor_id, p->device_id);
+    fflush(stdout);
 }
 
 void scan_devices(struct pci_access *pacc) {
@@ -55,11 +61,15 @@ void scan_devices(struct pci_access *pacc) {
     }
 }
 
-int main() {
+void lspci() {
     struct pci_access *pacc;
     pacc = pci_alloc();
     pci_init(pacc);
     scan_devices(pacc);
     pci_cleanup(pacc);
+}
+
+int main() {
+    lspci();
     return 0;
 }

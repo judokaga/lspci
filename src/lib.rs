@@ -67,8 +67,8 @@ fn read_vendors(mut m: HashMap<VendorID, Vendor>, line: String, reader: &mut Buf
         buf.remove(0);
         let mut it = buf.splitn(2, "  ");
         let device_id = DeviceID::from_str_radix(it.next().unwrap(), 16).unwrap();
-        let device_str = it.next().unwrap();
-        m1.insert(device_id, device_str.to_owned());
+        let device_name = it.next().unwrap().to_owned().trim_matches('\n').to_owned();
+        m1.insert(device_id, device_name);
     }
 }
 
@@ -99,6 +99,18 @@ fn id_to_str(id: &ID) -> String {
         },
         None => "Unknown PIC ID".to_owned(),
     }
+}
+
+#[no_mangle]
+pub extern "C" fn print_pci_name(vendor: i32, device: i32) {
+    let id = ID {
+        vendor: vendor,
+        device: device,
+    };
+    let name = id_to_str(&id);
+    print!("{}", name);
+    use std::io::Write;
+    std::io::stdout().flush().unwrap();
 }
 
 fn main() {
